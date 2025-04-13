@@ -19,6 +19,9 @@ import {
 } from '@/components/ui/select';
 import { Notification } from '@/types';
 
+// Define the notification type enum for better type safety
+type NotificationTypeEnum = 'info' | 'success' | 'warning' | 'error';
+
 const mockNotifications: Notification[] = [
   {
     id: '1',
@@ -128,7 +131,7 @@ const SldcNotifications = () => {
   // Get the number of unread notifications
   const unreadCount = notifications.filter(notification => !notification.read).length;
   
-  const getNotificationTypeIcon = (type: NotificationType) => {
+  const getNotificationTypeIcon = (type: NotificationTypeEnum) => {
     switch(type) {
       case 'info': 
         return <div className="w-2 h-2 rounded-full bg-blue-500 mr-2" />;
@@ -143,7 +146,7 @@ const SldcNotifications = () => {
     }
   };
   
-  const getNotificationTypeBadge = (type: NotificationType) => {
+  const getNotificationTypeBadge = (type: NotificationTypeEnum) => {
     switch(type) {
       case 'info': 
         return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Info</Badge>;

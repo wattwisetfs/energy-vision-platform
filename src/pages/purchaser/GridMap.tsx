@@ -15,14 +15,31 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
+import IndiaMap from '@/components/map/IndiaMap';
 
-// React Leaflet would normally be used here, but we'll simulate it
+interface Supplier {
+  id: string;
+  name: string;
+  resourceType: string;
+  location: { lat: number; lng: number; state: string };
+  price: number;
+  carbonIntensity: number;
+  capacity: number;
+  availability: number;
+  recommended: boolean;
+  purchaseHistory: {
+    date: string;
+    amount: number;
+    cost: number;
+  }[];
+}
+
 const GridMap = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [suppliers, setSuppliers] = useState<any[]>([]);
-  const [selectedSupplier, setSelectedSupplier] = useState<any>(null);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [filters, setFilters] = useState({
     resourceTypes: ['solar', 'wind', 'hydro', 'coal'],
     maxPrice: 8.5,
@@ -41,7 +58,7 @@ const GridMap = () => {
         // For demo, simulate an API call with mock data
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        const mockSuppliers = [
+        const mockSuppliers: Supplier[] = [
           {
             id: 's1',
             name: 'SolarPrime Energy',
@@ -125,6 +142,47 @@ const GridMap = () => {
             availability: 97,
             recommended: false,
             purchaseHistory: []
+          },
+          // Add more locations across different Indian states
+          {
+            id: 's7',
+            name: 'Maharashtra Solar',
+            resourceType: 'solar',
+            location: { lat: 19.0760, lng: 72.8777, state: 'Maharashtra' },
+            price: 4.1,
+            carbonIntensity: 0.02,
+            capacity: 200,
+            availability: 88,
+            recommended: true,
+            purchaseHistory: [
+              { date: '2023-04-08', amount: 180, cost: 738000 },
+            ]
+          },
+          {
+            id: 's8',
+            name: 'Gujarat Wind Farm',
+            resourceType: 'wind',
+            location: { lat: 23.0225, lng: 72.5714, state: 'Gujarat' },
+            price: 3.7,
+            carbonIntensity: 0.01,
+            capacity: 250,
+            availability: 75,
+            recommended: true,
+            purchaseHistory: []
+          },
+          {
+            id: 's9',
+            name: 'Tamil Nadu Power',
+            resourceType: 'hydro',
+            location: { lat: 13.0827, lng: 80.2707, state: 'Tamil Nadu' },
+            price: 4.4,
+            carbonIntensity: 0.03,
+            capacity: 180,
+            availability: 92,
+            recommended: false,
+            purchaseHistory: [
+              { date: '2023-04-12', amount: 160, cost: 704000 },
+            ]
           }
         ];
         
@@ -174,7 +232,7 @@ const GridMap = () => {
     return true;
   });
   
-  const handleSupplierClick = (supplier: any) => {
+  const handleSupplierClick = (supplier: Supplier) => {
     setSelectedSupplier(supplier);
   };
   
@@ -358,40 +416,43 @@ const GridMap = () => {
           
           {/* Map and Supplier List */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Map Placeholder */}
+            {/* India Map */}
             <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Map className="h-5 w-5 mr-2" />
+                  India Power Grid Map
+                </CardTitle>
+              </CardHeader>
               <CardContent className="p-0">
-                <div className="bg-gray-100 dark:bg-gray-800 h-[400px] relative flex items-center justify-center">
-                  {loading ? (
-                    <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                  ) : (
-                    <>
-                      {/* This would be a Leaflet map in a real implementation */}
-                      <div className="text-center">
-                        <Map className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                        <p className="text-gray-500">Map view would show supplier locations here</p>
-                        <p className="text-gray-500 text-sm">(Leaflet map integration would be used)</p>
-                      </div>
-                      
-                      {/* Simulate map pins */}
-                      {filteredSuppliers.map((supplier) => (
-                        <div 
-                          key={supplier.id}
-                          className={`absolute w-6 h-6 rounded-full flex items-center justify-center cursor-pointer transition-transform transform hover:scale-110 ${
-                            getResourceTypeColor(supplier.resourceType)
-                          } ${selectedSupplier?.id === supplier.id ? 'ring-2 ring-white' : ''}`}
-                          style={{ 
-                            left: `${30 + Math.random() * 60}%`, 
-                            top: `${20 + Math.random() * 60}%` 
-                          }}
-                          onClick={() => handleSupplierClick(supplier)}
-                        >
-                          {getResourceTypeIcon(supplier.resourceType)}
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </div>
+                {loading ? (
+                  <div className="flex justify-center items-center h-[400px]">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <IndiaMap
+                    locations={filteredSuppliers.map(supplier => ({
+                      name: supplier.name,
+                      lat: supplier.location.lat,
+                      lng: supplier.location.lng,
+                      state: supplier.location.state,
+                      resourceType: supplier.resourceType
+                    }))}
+                    selectedLocation={selectedSupplier ? {
+                      name: selectedSupplier.name,
+                      lat: selectedSupplier.location.lat,
+                      lng: selectedSupplier.location.lng,
+                      state: selectedSupplier.location.state,
+                      resourceType: selectedSupplier.resourceType
+                    } : null}
+                    onLocationSelect={(location) => {
+                      const supplier = suppliers.find(s => s.name === location.name);
+                      if (supplier) {
+                        handleSupplierClick(supplier);
+                      }
+                    }}
+                  />
+                )}
               </CardContent>
             </Card>
             
