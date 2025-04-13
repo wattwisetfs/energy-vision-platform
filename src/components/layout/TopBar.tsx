@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -62,7 +61,7 @@ const TopBar = ({ toggleSidebar }: TopBarProps) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const handleLogout = () => {
-    dispatch(signOut());
+    dispatch(signOut() as any);
     navigate('/login');
   };
 
