@@ -14,9 +14,18 @@ import SignUp from "./pages/auth/Signup";
 
 // Generator pages
 import GeneratorDashboard from "./pages/generator/Dashboard";
+import GeneratorSchedules from "./pages/generator/Schedules";
+import GeneratorManagement from "./pages/generator/Management";
+import GeneratorNotifications from "./pages/generator/Notifications";
 
 // Purchaser pages
 import PurchaserDashboard from "./pages/purchaser/Dashboard";
+import PurchaserPredictions from "./pages/purchaser/Predictions";
+import PurchaserGridMap from "./pages/purchaser/GridMap";
+import PurchaserPurchases from "./pages/purchaser/Purchases";
+import PurchaserReports from "./pages/purchaser/Reports";
+import PurchaserManagement from "./pages/purchaser/Management";
+import PurchaserNotifications from "./pages/purchaser/Notifications";
 
 // SLDC pages
 import SldcDashboard from "./pages/sldc/Dashboard";
@@ -42,18 +51,18 @@ function App() {
               
               {/* Generator Routes */}
               <Route path="/generator/dashboard" element={<GeneratorDashboard />} />
-              <Route path="/generator/schedules" element={<div>Schedules Page - Coming Soon</div>} />
-              <Route path="/generator/management" element={<div>Management Page - Coming Soon</div>} />
-              <Route path="/generator/notifications" element={<div>Notifications Page - Coming Soon</div>} />
+              <Route path="/generator/schedules" element={<GeneratorSchedules />} />
+              <Route path="/generator/management" element={<GeneratorManagement />} />
+              <Route path="/generator/notifications" element={<GeneratorNotifications />} />
               
               {/* Purchaser Routes */}
               <Route path="/purchaser/dashboard" element={<PurchaserDashboard />} />
-              <Route path="/purchaser/predictions" element={<div>Predictions Page - Coming Soon</div>} />
-              <Route path="/purchaser/grid-map" element={<div>Grid Map Page - Coming Soon</div>} />
-              <Route path="/purchaser/purchases" element={<div>Purchases Page - Coming Soon</div>} />
-              <Route path="/purchaser/reports" element={<div>Reports Page - Coming Soon</div>} />
-              <Route path="/purchaser/management" element={<div>Management Page - Coming Soon</div>} />
-              <Route path="/purchaser/notifications" element={<div>Notifications Page - Coming Soon</div>} />
+              <Route path="/purchaser/predictions" element={<PurchaserPredictions />} />
+              <Route path="/purchaser/grid-map" element={<PurchaserGridMap />} />
+              <Route path="/purchaser/purchases" element={<PurchaserPurchases />} />
+              <Route path="/purchaser/reports" element={<PurchaserReports />} />
+              <Route path="/purchaser/management" element={<PurchaserManagement />} />
+              <Route path="/purchaser/notifications" element={<PurchaserNotifications />} />
               
               {/* SLDC Routes */}
               <Route path="/sldc/dashboard" element={<SldcDashboard />} />

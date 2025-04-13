@@ -138,7 +138,7 @@ const Sidebar = ({ isOpen, setIsOpen, user }: SidebarProps) => {
             </div>
             <div>
               <h1 className="text-lg font-bold bg-gradient-to-r from-energy-blue to-energy-green bg-clip-text text-transparent">
-                EnergyVision
+                WattWise
               </h1>
               <p className="text-xs text-gray-500 capitalize">{user.role} Portal</p>
             </div>

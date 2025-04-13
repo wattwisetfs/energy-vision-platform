@@ -25,7 +25,7 @@ const LandingPage = () => {
                   <BarChart3 className="h-6 w-6 text-white" />
                 </div>
               </div>
-              <h1 className="ml-3 text-xl font-bold text-gray-900 dark:text-white">EnergyVision</h1>
+              <h1 className="ml-3 text-xl font-bold text-gray-900 dark:text-white">WattWise</h1>
             </div>
             <div className="hidden md:block">
               <div className="flex items-center space-x-4">
@@ -59,7 +59,7 @@ const LandingPage = () => {
                 Smarter Energy Predictions for a Sustainable Future
               </h1>
               <p className="mt-6 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto lg:mx-0">
-                EnergyVision combines advanced analytics with real-time data to optimize energy forecasting, 
+                WattWise combines advanced analytics with real-time data to optimize energy forecasting, 
                 generation scheduling, and consumption patterns - helping build a more sustainable grid.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-4">
@@ -239,7 +239,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
-              How EnergyVision Works
+              How WattWise Works
             </h2>
             <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400">
               A streamlined platform connecting energy producers, purchasers and regulators
@@ -378,7 +378,7 @@ const LandingPage = () => {
             Ready to transform your energy operations?
           </h2>
           <p className="mt-4 text-lg leading-6 max-w-2xl mx-auto">
-            Join EnergyVision today and access powerful tools for forecasting, optimization, and sustainability.
+            Join WattWise today and access powerful tools for forecasting, optimization, and sustainability.
           </p>
           <div className="mt-8 flex justify-center">
             <Link to="/signup">
@@ -399,7 +399,7 @@ const LandingPage = () => {
                 <div className="h-8 w-8 rounded-md bg-gradient-to-r from-energy-blue to-energy-green flex items-center justify-center">
                   <BarChart3 className="h-5 w-5 text-white" />
                 </div>
-                <h3 className="ml-3 text-lg font-bold">EnergyVision</h3>
+                <h3 className="ml-3 text-lg font-bold">WattWise</h3>
               </div>
               <p className="mt-4 text-sm">
                 Smarter energy predictions for a sustainable future.
@@ -435,7 +435,7 @@ const LandingPage = () => {
           </div>
 
           <div className="mt-12 border-t border-gray-700 pt-8 flex flex-col sm:flex-row justify-between">
-            <p className="text-sm">© 2023 EnergyVision. All rights reserved.</p>
+            <p className="text-sm">© 2023 WattWise. All rights reserved.</p>
             <div className="mt-4 sm:mt-0 flex space-x-6">
               <a href="#" className="text-gray-400 hover:text-white">
                 Privacy Policy
