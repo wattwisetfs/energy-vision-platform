@@ -90,8 +90,10 @@ const PieChart = ({
           },
         },
         animation: {
-          animateRotate: true,
-          animateScale: true
+          // Remove animateRotate and animateScale properties as they're not recognized in the type definitions
+          // Use standard animation properties instead
+          duration: 1000,
+          easing: 'easeOutQuart',
         },
       },
     };
