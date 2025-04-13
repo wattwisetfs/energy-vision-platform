@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
@@ -59,6 +58,7 @@ const GridMap = () => {
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         const mockSuppliers: Supplier[] = [
+          // Karnataka
           {
             id: 's1',
             name: 'SolarPrime Energy',
@@ -76,7 +76,7 @@ const GridMap = () => {
           },
           {
             id: 's2',
-            name: 'WindForce',
+            name: 'WindForce Karnataka',
             resourceType: 'wind',
             location: { lat: 13.1986, lng: 77.7066, state: 'Karnataka' },
             price: 3.8,
@@ -100,50 +100,8 @@ const GridMap = () => {
             recommended: false,
             purchaseHistory: []
           },
-          {
-            id: 's4',
-            name: 'CoalMax Energy',
-            resourceType: 'coal',
-            location: { lat: 13.0298, lng: 77.5971, state: 'Karnataka' },
-            price: 2.9,
-            carbonIntensity: 0.78,
-            capacity: 500,
-            availability: 98,
-            recommended: false,
-            purchaseHistory: [
-              { date: '2023-04-12', amount: 300, cost: 870000 },
-              { date: '2023-04-08', amount: 250, cost: 725000 },
-              { date: '2023-04-02', amount: 350, cost: 1015000 },
-            ]
-          },
-          {
-            id: 's5',
-            name: 'MegaSolar',
-            resourceType: 'solar',
-            location: { lat: 12.9010, lng: 77.6210, state: 'Karnataka' },
-            price: 4.0,
-            carbonIntensity: 0.02,
-            capacity: 175,
-            availability: 82,
-            recommended: true,
-            purchaseHistory: [
-              { date: '2023-04-11', amount: 100, cost: 400000 },
-              { date: '2023-04-04', amount: 125, cost: 500000 },
-            ]
-          },
-          {
-            id: 's6',
-            name: 'Thermal Industries',
-            resourceType: 'coal',
-            location: { lat: 13.0478, lng: 77.6043, state: 'Karnataka' },
-            price: 3.1,
-            carbonIntensity: 0.76,
-            capacity: 450,
-            availability: 97,
-            recommended: false,
-            purchaseHistory: []
-          },
-          // Add more locations across different Indian states
+          
+          // Maharashtra
           {
             id: 's7',
             name: 'Maharashtra Solar',
@@ -159,6 +117,34 @@ const GridMap = () => {
             ]
           },
           {
+            id: 's11',
+            name: 'Pune Wind Energy',
+            resourceType: 'wind',
+            location: { lat: 18.5204, lng: 73.8567, state: 'Maharashtra' },
+            price: 3.9,
+            carbonIntensity: 0.01,
+            capacity: 180,
+            availability: 75,
+            recommended: false,
+            purchaseHistory: []
+          },
+          {
+            id: 's12',
+            name: 'Nagpur Thermal',
+            resourceType: 'coal',
+            location: { lat: 21.1458, lng: 79.0882, state: 'Maharashtra' },
+            price: 3.0,
+            carbonIntensity: 0.79,
+            capacity: 500,
+            availability: 98,
+            recommended: false,
+            purchaseHistory: [
+              { date: '2023-04-10', amount: 450, cost: 1350000 },
+            ]
+          },
+          
+          // Gujarat
+          {
             id: 's8',
             name: 'Gujarat Wind Farm',
             resourceType: 'wind',
@@ -170,6 +156,22 @@ const GridMap = () => {
             recommended: true,
             purchaseHistory: []
           },
+          {
+            id: 's13',
+            name: 'Kutch Solar Park',
+            resourceType: 'solar',
+            location: { lat: 23.7337, lng: 69.7999, state: 'Gujarat' },
+            price: 4.0,
+            carbonIntensity: 0.02,
+            capacity: 300,
+            availability: 90,
+            recommended: true,
+            purchaseHistory: [
+              { date: '2023-04-07', amount: 280, cost: 1120000 },
+            ]
+          },
+          
+          // Tamil Nadu
           {
             id: 's9',
             name: 'Tamil Nadu Power',
@@ -183,7 +185,151 @@ const GridMap = () => {
             purchaseHistory: [
               { date: '2023-04-12', amount: 160, cost: 704000 },
             ]
-          }
+          },
+          {
+            id: 's14',
+            name: 'Coimbatore Wind',
+            resourceType: 'wind',
+            location: { lat: 11.0168, lng: 76.9558, state: 'Tamil Nadu' },
+            price: 3.8,
+            carbonIntensity: 0.01,
+            capacity: 220,
+            availability: 78,
+            recommended: false,
+            purchaseHistory: []
+          },
+          
+          // Rajasthan
+          {
+            id: 's15',
+            name: 'Rajasthan Sun Energy',
+            resourceType: 'solar',
+            location: { lat: 26.9124, lng: 75.7873, state: 'Rajasthan' },
+            price: 3.9,
+            carbonIntensity: 0.02,
+            capacity: 350,
+            availability: 95,
+            recommended: true,
+            purchaseHistory: [
+              { date: '2023-04-06', amount: 330, cost: 1287000 },
+            ]
+          },
+          {
+            id: 's16',
+            name: 'Jodhpur Solar',
+            resourceType: 'solar',
+            location: { lat: 26.2389, lng: 73.0243, state: 'Rajasthan' },
+            price: 3.8,
+            carbonIntensity: 0.02,
+            capacity: 280,
+            availability: 92,
+            recommended: true,
+            purchaseHistory: []
+          },
+          
+          // Uttar Pradesh
+          {
+            id: 's17',
+            name: 'UP Thermal Plant',
+            resourceType: 'coal',
+            location: { lat: 26.8467, lng: 80.9462, state: 'Uttar Pradesh' },
+            price: 2.8,
+            carbonIntensity: 0.78,
+            capacity: 550,
+            availability: 97,
+            recommended: false,
+            purchaseHistory: [
+              { date: '2023-04-09', amount: 500, cost: 1400000 },
+            ]
+          },
+          {
+            id: 's18',
+            name: 'Allahabad Power',
+            resourceType: 'coal',
+            location: { lat: 25.4358, lng: 81.8463, state: 'Uttar Pradesh' },
+            price: 2.9,
+            carbonIntensity: 0.77,
+            capacity: 480,
+            availability: 96,
+            recommended: false,
+            purchaseHistory: []
+          },
+          
+          // West Bengal
+          {
+            id: 's19',
+            name: 'Bengal Hydro',
+            resourceType: 'hydro',
+            location: { lat: 22.5726, lng: 88.3639, state: 'West Bengal' },
+            price: 4.3,
+            carbonIntensity: 0.03,
+            capacity: 200,
+            availability: 90,
+            recommended: true,
+            purchaseHistory: [
+              { date: '2023-04-11', amount: 180, cost: 774000 },
+            ]
+          },
+          
+          // Assam
+          {
+            id: 's20',
+            name: 'Assam Green',
+            resourceType: 'hydro',
+            location: { lat: 26.1433, lng: 91.7898, state: 'Assam' },
+            price: 4.6,
+            carbonIntensity: 0.03,
+            capacity: 160,
+            availability: 88,
+            recommended: false,
+            purchaseHistory: []
+          },
+          
+          // Delhi
+          {
+            id: 's21',
+            name: 'Delhi Urban Solar',
+            resourceType: 'solar',
+            location: { lat: 28.7041, lng: 77.1025, state: 'Delhi' },
+            price: 4.5,
+            carbonIntensity: 0.02,
+            capacity: 100,
+            availability: 80,
+            recommended: false,
+            purchaseHistory: [
+              { date: '2023-04-05', amount: 90, cost: 405000 },
+            ]
+          },
+          
+          // Punjab
+          {
+            id: 's22',
+            name: 'Punjab Wind Farm',
+            resourceType: 'wind',
+            location: { lat: 31.1471, lng: 75.3412, state: 'Punjab' },
+            price: 3.9,
+            carbonIntensity: 0.01,
+            capacity: 190,
+            availability: 72,
+            recommended: true,
+            purchaseHistory: []
+          },
+          
+          // Telangana
+          {
+            id: 's23',
+            name: 'Telangana Solar',
+            resourceType: 'solar',
+            location: { lat: 17.3850, lng: 78.4867, state: 'Telangana' },
+            price: 4.0,
+            carbonIntensity: 0.02,
+            capacity: 230,
+            availability: 89,
+            recommended: true,
+            purchaseHistory: [
+              { date: '2023-04-03', amount: 210, cost: 840000 },
+            ]
+          },
         ];
         
         setSuppliers(mockSuppliers);
@@ -416,17 +562,17 @@ const GridMap = () => {
           
           {/* Map and Supplier List */}
           <div className="lg:col-span-2 space-y-6">
-            {/* India Map */}
+            {/* Enhanced India Map Card */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center">
                   <Map className="h-5 w-5 mr-2" />
                   India Power Grid Map
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-0">
+              <CardContent className="p-2">
                 {loading ? (
-                  <div className="flex justify-center items-center h-[400px]">
+                  <div className="flex justify-center items-center h-[500px]">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
                 ) : (
