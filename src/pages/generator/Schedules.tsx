@@ -1,121 +1,222 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import MainLayout from '@/components/layout/MainLayout';
-import { firebaseService } from '@/services/api';
-import { Schedule } from '@/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, FileText, Upload, Eye, Calendar, Clock } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon, Plus, Loader2, ArrowDown10, ArrowUp10, Download, Edit, Trash } from 'lucide-react';
+import { format } from 'date-fns';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DialogClose, DialogFooter } from '@/components/ui/dialog';
+
+interface Schedule {
+  scheduleId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  powerAvailable: number;
+  price: number;
+  status: 'draft' | 'submitted' | 'approved' | 'rejected';
+}
 
 const GeneratorSchedules = () => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
-  const [activeSchedule, setActiveSchedule] = useState<Schedule | null>(null);
-  const [newScheduleData, setNewScheduleData] = useState<string>('');
-  const [submittingSchedule, setSubmittingSchedule] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      setLoading(true);
-      setError(null);
+  // For schedule creation/editing form
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [startTime, setStartTime] = useState('09:00');
+  const [endTime, setEndTime] = useState('17:00');
+  const [powerAvailable, setPowerAvailable] = useState(100);
+  const [price, setPrice] = useState(4);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editScheduleId, setEditScheduleId] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-      try {
-        if (user?.organizationId) {
-          const schedulesData = await firebaseService.getSchedules(user.organizationId);
-          setSchedules(schedulesData);
-        }
-      } catch (err) {
-        console.error('Error fetching schedules:', err);
-        setError('Failed to load schedules. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Sample schedules
+  const [schedules, setSchedules] = useState<Schedule[]>([
+    {
+      scheduleId: '1',
+      date: '2025-04-14',
+      startTime: '09:00',
+      endTime: '17:00',
+      powerAvailable: 120,
+      price: 3.8,
+      status: 'approved'
+    },
+    {
+      scheduleId: '2',
+      date: '2025-04-15',
+      startTime: '10:00',
+      endTime: '18:00',
+      powerAvailable: 150,
+      price: 4.2,
+      status: 'submitted'
+    },
+    {
+      scheduleId: '3',
+      date: '2025-04-16',
+      startTime: '08:00',
+      endTime: '16:00',
+      powerAvailable: 100,
+      price: 3.5,
+      status: 'draft'
+    }
+  ]);
 
-    fetchSchedules();
-  }, [user]);
-
-  const handleViewSchedule = (schedule: Schedule) => {
-    setActiveSchedule(schedule);
-  };
-
-  const handleSubmitSchedule = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmittingSchedule(true);
-
+    setLoading(true);
+    
     try {
-      // Validate JSON
-      const scheduleData = JSON.parse(newScheduleData);
-      
-      if (!user?.organizationId) {
-        throw new Error("User organization not found");
+      if (!date) {
+        throw new Error("Date is required");
       }
-
-      // In a real app, we would call a service to submit the schedule
-      // For demo purposes, we'll simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Add the new schedule to the list
-      const newSchedule: Schedule = {
-        id: `schedule-${Date.now()}`,
-        organizationId: user.organizationId,
-        state: user.state || 'Unknown',
-        date: new Date().toISOString(),
-        data: scheduleData,
-        resourceType: scheduleData.resourceType || 'solar',
-        status: 'sent',
-        createdAt: new Date().toISOString()
-      };
-
-      setSchedules([newSchedule, ...schedules]);
-      setNewScheduleData('');
       
+      // In a real app, we would save to the backend
+      // For demo, simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      
+      if (isEditing && editScheduleId) {
+        setSchedules(schedules.map(schedule => {
+          if (schedule.scheduleId === editScheduleId) {
+            return {
+              ...schedule,
+              date: formattedDate,
+              startTime,
+              endTime,
+              powerAvailable,
+              price,
+            };
+          }
+          return schedule;
+        }));
+        
+        toast({
+          title: "Schedule updated",
+          description: `Schedule for ${formattedDate} has been updated successfully.`,
+        });
+      } else {
+        const newSchedule: Schedule = {
+          scheduleId: Math.random().toString(36).substr(2, 9),
+          date: formattedDate,
+          startTime,
+          endTime,
+          powerAvailable,
+          price,
+          status: 'draft'
+        };
+        
+        setSchedules([...schedules, newSchedule]);
+        
+        toast({
+          title: "Schedule created",
+          description: `New schedule for ${formattedDate} has been created successfully.`,
+        });
+      }
+      
+      // Reset form
+      resetForm();
+      setIsDialogOpen(false);
+    } catch (error) {
       toast({
-        title: "Schedule Submitted",
-        description: "Your generation schedule has been submitted successfully.",
-        variant: "default",
-      });
-    } catch (err) {
-      console.error('Error submitting schedule:', err);
-      toast({
-        title: "Submission Failed",
-        description: err instanceof Error ? err.message : "Please check your JSON format and try again.",
+        title: "Error",
+        description: "There was an error saving the schedule. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setSubmittingSchedule(false);
+      setLoading(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  const resetForm = () => {
+    setDate(new Date());
+    setStartTime('09:00');
+    setEndTime('17:00');
+    setPowerAvailable(100);
+    setPrice(4);
+    setIsEditing(false);
+    setEditScheduleId(null);
   };
 
-  const getStatusBadgeColor = (status: string) => {
+  const handleEdit = (schedule: Schedule) => {
+    setIsEditing(true);
+    setEditScheduleId(schedule.scheduleId);
+    setDate(new Date(schedule.date));
+    setStartTime(schedule.startTime);
+    setEndTime(schedule.endTime);
+    setPowerAvailable(schedule.powerAvailable);
+    setPrice(schedule.price);
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async (scheduleId: string) => {
+    try {
+      // In a real app, we would call the API to delete
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setSchedules(schedules.filter(schedule => schedule.scheduleId !== scheduleId));
+      
+      toast({
+        title: "Schedule deleted",
+        description: "The schedule has been deleted successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was an error deleting the schedule. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownloadCSV = () => {
+    // Prepare CSV content
+    const header = ['Date', 'Start Time', 'End Time', 'Power Available (MW)', 'Price (₹/kWh)', 'Status'];
+    const rows = schedules.map(schedule => [
+      schedule.date,
+      schedule.startTime,
+      schedule.endTime,
+      schedule.powerAvailable.toString(),
+      schedule.price.toString(),
+      schedule.status
+    ]);
+    
+    const csvContent = [
+      header.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'power_schedules.csv';
+    document.body.appendChild(link);
+    link.dispatchEvent(new MouseEvent('click'));
+    document.body.removeChild(link);
+  };
+
+  const getStatusClass = (status: string) => {
     switch (status) {
-      case 'draft':
-        return 'bg-gray-100 text-gray-800';
-      case 'sent':
-        return 'bg-blue-100 text-blue-800';
-      case 'received':
-        return 'bg-green-100 text-green-800';
+      case 'approved':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'submitted':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case 'rejected':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     }
   };
 
@@ -123,172 +224,183 @@ const GeneratorSchedules = () => {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <h1 className="text-2xl font-bold">Generation Schedules</h1>
-        </div>
-
-        <Tabs defaultValue="submit">
-          <TabsList className="mb-4">
-            <TabsTrigger value="submit">Submit Schedule</TabsTrigger>
-            <TabsTrigger value="history">Schedule History</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="submit">
-            <Card>
-              <CardHeader>
-                <CardTitle>Submit New Generation Schedule</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmitSchedule} className="space-y-4">
-                  <div className="grid gap-4">
+          <h1 className="text-2xl font-bold">Power Schedules</h1>
+          <div className="flex items-center space-x-2 mt-2 md:mt-0">
+            <Button variant="outline" size="sm" onClick={handleDownloadCSV}>
+              <Download className="mr-2 h-4 w-4" />
+              Export CSV
+            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={() => {
+                  resetForm();
+                  setIsEditing(false);
+                }}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Schedule
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>{isEditing ? 'Edit Schedule' : 'Create New Schedule'}</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for your power availability schedule.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="date">Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          id="date"
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {date ? format(date, 'PPP') : 'Select a date'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={date}
+                          onSelect={setDate}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="schedule-data">Schedule JSON Data</Label>
-                      <Textarea
-                        id="schedule-data"
-                        placeholder='{"resourceType": "solar", "hourlyMW": [{"hour": 0, "value": 0}, {"hour": 1, "value": 0}, ...]}'
-                        className="min-h-[200px] font-mono"
-                        value={newScheduleData}
-                        onChange={(e) => setNewScheduleData(e.target.value)}
+                      <Label htmlFor="startTime">Start Time</Label>
+                      <Input
+                        id="startTime"
+                        type="time"
+                        value={startTime}
+                        onChange={(e) => setStartTime(e.target.value)}
                         required
                       />
-                      <p className="text-sm text-gray-500">
-                        Enter your generation schedule data in JSON format, including resourceType and hourly production values.
-                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="endTime">End Time</Label>
+                      <Input
+                        id="endTime"
+                        type="time"
+                        value={endTime}
+                        onChange={(e) => setEndTime(e.target.value)}
+                        required
+                      />
                     </div>
                   </div>
-                  <div className="flex justify-end">
-                    <Button type="submit" disabled={submittingSchedule}>
-                      {submittingSchedule ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="powerAvailable">Power Available (MW)</Label>
+                      <Input
+                        id="powerAvailable"
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={powerAvailable}
+                        onChange={(e) => setPowerAvailable(Number(e.target.value))}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="price">Price (₹/kWh)</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        value={price}
+                        onChange={(e) => setPrice(Number(e.target.value))}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter className="mt-6">
+                    <DialogClose asChild>
+                      <Button type="button" variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <Button type="submit" disabled={loading}>
+                      {loading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Submitting...
+                          {isEditing ? 'Updating...' : 'Creating...'}
                         </>
                       ) : (
-                        <>
-                          <Upload className="mr-2 h-4 w-4" />
-                          Submit Schedule
-                        </>
+                        <>{isEditing ? 'Update Schedule' : 'Create Schedule'}</>
                       )}
                     </Button>
-                  </div>
+                  </DialogFooter>
                 </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="history">
-            <Card>
-              <CardHeader>
-                <CardTitle>Schedule History</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="flex justify-center items-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : error ? (
-                  <div className="text-center py-8">
-                    <p className="text-red-600 mb-2">{error}</p>
-                    <Button variant="outline" onClick={() => window.location.reload()}>
-                      Retry
-                    </Button>
-                  </div>
-                ) : schedules.length === 0 ? (
-                  <div className="text-center py-8">
-                    <FileText className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                    <h3 className="text-lg font-medium mb-1">No schedules yet</h3>
-                    <p className="text-gray-500 mb-4">Submit your first generation schedule to see it here.</p>
-                    <Button onClick={() => document.querySelector('[data-value="submit"]')?.click()}>
-                      Submit a Schedule
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Resource Type</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Submission Time</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {schedules.map((schedule) => (
-                          <TableRow key={schedule.id}>
-                            <TableCell>
-                              <div className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                                {formatDate(schedule.date)}
-                              </div>
-                            </TableCell>
-                            <TableCell className="capitalize">{schedule.resourceType}</TableCell>
-                            <TableCell>
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(schedule.status)}`}>
-                                {schedule.status}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center text-sm text-gray-500">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {new Date(schedule.createdAt).toLocaleTimeString()}
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Dialog>
-                                <DialogTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleViewSchedule(schedule)}
-                                  >
-                                    <Eye className="h-4 w-4 mr-1" />
-                                    View
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-2xl">
-                                  <DialogHeader>
-                                    <DialogTitle>Schedule Details</DialogTitle>
-                                  </DialogHeader>
-                                  {activeSchedule && (
-                                    <div className="mt-4">
-                                      <div className="flex justify-between mb-4">
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Date</p>
-                                          <p>{formatDate(activeSchedule.date)}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Resource Type</p>
-                                          <p className="capitalize">{activeSchedule.resourceType}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Status</p>
-                                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(activeSchedule.status)}`}>
-                                            {activeSchedule.status}
-                                          </span>
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <p className="text-sm font-medium text-gray-500 mb-2">Schedule Data</p>
-                                        <pre className="bg-gray-50 dark:bg-gray-900 p-4 rounded-md overflow-x-auto font-mono text-sm">
-                                          {JSON.stringify(activeSchedule.data, null, 2)}
-                                        </pre>
-                                      </div>
-                                    </div>
-                                  )}
-                                </DialogContent>
-                              </Dialog>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Schedules</CardTitle>
+            <CardDescription>Manage your power availability schedules</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {schedules.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">No schedules created yet.</p>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button onClick={resetForm}>Create Your First Schedule</Button>
+                  </DialogTrigger>
+                  {/* Dialog content is the same as above */}
+                </Dialog>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/50">
+                    <tr>
+                      <th className="text-left py-3 px-4 font-medium">Date</th>
+                      <th className="text-left py-3 px-4 font-medium">Time</th>
+                      <th className="text-left py-3 px-4 font-medium">Power (MW)</th>
+                      <th className="text-left py-3 px-4 font-medium">Price (₹/kWh)</th>
+                      <th className="text-left py-3 px-4 font-medium">Status</th>
+                      <th className="text-right py-3 px-4 font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {schedules.map((schedule) => (
+                      <tr key={schedule.scheduleId} className="border-b">
+                        <td className="py-3 px-4">{format(new Date(schedule.date), 'MMM dd, yyyy')}</td>
+                        <td className="py-3 px-4">{`${schedule.startTime} - ${schedule.endTime}`}</td>
+                        <td className="py-3 px-4">{schedule.powerAvailable}</td>
+                        <td className="py-3 px-4">₹{schedule.price.toFixed(2)}</td>
+                        <td className="py-3 px-4">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(schedule.status)}`}>
+                            {schedule.status.charAt(0).toUpperCase() + schedule.status.slice(1)}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex justify-end space-x-2">
+                            <Button variant="ghost" size="icon" onClick={() => handleEdit(schedule)}>
+                              <Edit className="h-4 w-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDelete(schedule.scheduleId)}>
+                              <Trash className="h-4 w-4" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </MainLayout>
   );

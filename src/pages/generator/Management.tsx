@@ -28,7 +28,7 @@ const GeneratorManagement = () => {
   // Mock user data with resource types
   const initialResourceTypes = ['solar', 'wind']; // In a real app, this would come from user data
   
-  const [orgName, setOrgName] = useState(user?.organizationName || 'My Generator Company');
+  const [orgName, setOrgName] = useState(user?.name || 'EnergyVision Generator');
   const [state, setState] = useState(user?.state || 'Karnataka');
   const [selectedResourceTypes, setSelectedResourceTypes] = useState<string[]>(initialResourceTypes);
   const [saving, setSaving] = useState(false);

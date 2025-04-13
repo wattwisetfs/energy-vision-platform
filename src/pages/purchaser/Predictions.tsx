@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
@@ -7,7 +6,7 @@ import { apiService } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Calendar, BarChart3, Download, LineChart } from 'lucide-react';
+import { Loader2, Calendar, BarChart3, Download, LineChartIcon } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LineChart from '@/components/dashboard/LineChart';
@@ -42,42 +41,35 @@ const PurchaserPredictions = () => {
     setLoading(true);
     
     try {
-      // In a real app, we would call the API service
-      // For demo, simulate an API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Mock forecast data
       const mockData: ForecastData[] = [];
       const start = new Date(startDate);
       const end = new Date(endDate);
       
-      // Generate timestamps based on frequency
       let currentDate = new Date(start);
       while (currentDate <= end) {
         let timeIncrement: number;
         
         switch(frequency) {
           case '5min':
-            timeIncrement = 5 * 60 * 1000; // 5 minutes
+            timeIncrement = 5 * 60 * 1000;
             break;
           case 'daily':
-            timeIncrement = 24 * 60 * 60 * 1000; // 1 day
+            timeIncrement = 24 * 60 * 60 * 1000;
             break;
           case 'hourly':
           default:
-            timeIncrement = 60 * 60 * 1000; // 1 hour
+            timeIncrement = 60 * 60 * 1000;
             break;
         }
         
-        // Generate random load value (250-450)
         const baseLoad = 250 + Math.random() * 200;
         
-        // Apply factor impacts
         let adjustedLoad = baseLoad;
         if (!ignoreFactors.weather) adjustedLoad *= (0.9 + Math.random() * 0.2);
         if (!ignoreFactors.season) adjustedLoad *= (0.95 + Math.random() * 0.1);
         if (!ignoreFactors.weekday) {
-          // Weekend penalty
           const day = currentDate.getDay();
           if (day === 0 || day === 6) adjustedLoad *= 0.85;
         }
@@ -113,7 +105,6 @@ const PurchaserPredictions = () => {
     }
   };
   
-  // Process data for charts
   const prepareLineChartData = () => {
     if (forecastData.length === 0) return { labels: [], datasets: [] };
     
@@ -144,7 +135,6 @@ const PurchaserPredictions = () => {
   const prepareBarChartData = () => {
     if (forecastData.length === 0) return { labels: [], datasets: [] };
     
-    // Average the feature impacts across all data points
     const impactSums: {[key: string]: number} = {};
     const impactCounts: {[key: string]: number} = {};
     
@@ -184,7 +174,6 @@ const PurchaserPredictions = () => {
   const handleDownloadCSV = () => {
     if (forecastData.length === 0) return;
     
-    // Prepare CSV content
     const header = ['Timestamp', 'Predicted Load (MW)', ...Object.keys(forecastData[0].feature_impacts)];
     const rows = forecastData.map(data => [
       data.timestamp,
@@ -197,7 +186,6 @@ const PurchaserPredictions = () => {
       ...rows.map(row => row.join(','))
     ].join('\n');
     
-    // Create download link
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -323,7 +311,7 @@ const PurchaserPredictions = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <LineChart className="h-5 w-5 mr-2" />
+                    <LineChartIcon className="h-5 w-5 mr-2" />
                     Load Prediction
                   </CardTitle>
                 </CardHeader>
