@@ -29,6 +29,10 @@ import PurchaserNotifications from "./pages/purchaser/Notifications";
 
 // SLDC pages
 import SldcDashboard from "./pages/sldc/Dashboard";
+import SldcSchedules from "./pages/sldc/Schedules";
+import SldcReports from "./pages/sldc/Reports";
+import SldcManagement from "./pages/sldc/Management";
+import SldcNotifications from "./pages/sldc/Notifications";
 
 // 404 page
 import NotFound from "./pages/NotFound";
@@ -64,12 +68,12 @@ function App() {
               <Route path="/purchaser/management" element={<PurchaserManagement />} />
               <Route path="/purchaser/notifications" element={<PurchaserNotifications />} />
               
-              {/* SLDC Routes */}
+              {/* SLDC Routes - now using our implemented pages */}
               <Route path="/sldc/dashboard" element={<SldcDashboard />} />
-              <Route path="/sldc/schedules" element={<div>Schedules Page - Coming Soon</div>} />
-              <Route path="/sldc/reports" element={<div>Reports Page - Coming Soon</div>} />
-              <Route path="/sldc/management" element={<div>Management Page - Coming Soon</div>} />
-              <Route path="/sldc/notifications" element={<div>Notifications Page - Coming Soon</div>} />
+              <Route path="/sldc/schedules" element={<SldcSchedules />} />
+              <Route path="/sldc/reports" element={<SldcReports />} />
+              <Route path="/sldc/management" element={<SldcManagement />} />
+              <Route path="/sldc/notifications" element={<SldcNotifications />} />
               
               {/* Default redirect to home */}
               <Route path="/index" element={<Navigate replace to="/" />} />

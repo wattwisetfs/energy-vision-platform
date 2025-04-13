@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
@@ -26,7 +25,8 @@ const PurchaserManagement = () => {
   // Mock user data
   const initialPurchaserTypes = ['distribution']; // In a real app, this would come from user data
   
-  const [orgName, setOrgName] = useState(user?.name || 'EnergyVision Purchaser');
+  // Use organizationId instead of name which doesn't exist on the User type
+  const [orgName, setOrgName] = useState(user?.organizationId || 'WattWise Purchaser');
   const [state, setState] = useState(user?.state || 'Karnataka');
   const [selectedPurchaserTypes, setSelectedPurchaserTypes] = useState<string[]>(initialPurchaserTypes);
   const [saving, setSaving] = useState(false);

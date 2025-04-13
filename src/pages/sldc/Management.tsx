@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
@@ -7,38 +8,28 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { Loader2, Save, Settings } from 'lucide-react';
 
-const resourceTypes = [
-  { id: 'solar', label: 'Solar' },
-  { id: 'wind', label: 'Wind' },
-  { id: 'hydro', label: 'Hydro' },
-  { id: 'coal', label: 'Coal' },
-  { id: 'gas', label: 'Natural Gas' },
-  { id: 'biomass', label: 'Biomass' },
-  { id: 'nuclear', label: 'Nuclear' }
-];
-
-const GeneratorManagement = () => {
+const SldcManagement = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const { toast } = useToast();
   
-  // Mock user data with resource types
-  const initialResourceTypes = ['solar', 'wind']; // In a real app, this would come from user data
-  
-  // Use organizationId instead of name which doesn't exist on the User type
-  const [orgName, setOrgName] = useState(user?.organizationId || 'WattWise Generator');
+  const [orgName, setOrgName] = useState(user?.organizationId || 'WattWise SLDC');
   const [state, setState] = useState(user?.state || 'Karnataka');
-  const [selectedResourceTypes, setSelectedResourceTypes] = useState<string[]>(initialResourceTypes);
+  const [settings, setSettings] = useState({
+    automaticVerification: false,
+    notifyOnScheduleSubmission: true,
+    notifyOnReportSubmission: true,
+    enablePredictionCorrection: false
+  });
   const [saving, setSaving] = useState(false);
 
-  const handleResourceTypeChange = (typeId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedResourceTypes([...selectedResourceTypes, typeId]);
-    } else {
-      setSelectedResourceTypes(selectedResourceTypes.filter(id => id !== typeId));
-    }
+  const handleSettingChange = (setting: keyof typeof settings, checked: boolean) => {
+    setSettings({
+      ...settings,
+      [setting]: checked
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,8 +37,7 @@ const GeneratorManagement = () => {
     setSaving(true);
     
     try {
-      // In a real app, we would update the user data in Firestore
-      // For demo, simulate an API call
+      // In a real app, we would update the user data in backend
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
@@ -79,7 +69,7 @@ const GeneratorManagement = () => {
               Organization Settings
             </CardTitle>
             <CardDescription>
-              Update your organization details and resource types
+              Update your SLDC details and notification preferences
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -105,34 +95,59 @@ const GeneratorManagement = () => {
                   />
                 </div>
 
-                <div className="grid gap-2 pt-2">
-                  <Label className="mb-2">Resource Types</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {resourceTypes.map((type) => (
-                      <div key={type.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`resource-${type.id}`}
-                          checked={selectedResourceTypes.includes(type.id)}
-                          onCheckedChange={(checked) => 
-                            handleResourceTypeChange(type.id, checked as boolean)
-                          }
-                        />
-                        <Label htmlFor={`resource-${type.id}`}>{type.label}</Label>
-                      </div>
-                    ))}
+                <div className="grid gap-4 pt-2">
+                  <Label className="mb-2">Notification Preferences</Label>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Notify on Schedule Submission</p>
+                      <p className="text-sm text-gray-500">Get notified when generators submit schedules</p>
+                    </div>
+                    <Switch
+                      checked={settings.notifyOnScheduleSubmission}
+                      onCheckedChange={(checked) => handleSettingChange('notifyOnScheduleSubmission', checked)}
+                    />
                   </div>
-                  {selectedResourceTypes.length === 0 && (
-                    <p className="text-sm text-red-500 mt-1">
-                      Please select at least one resource type
-                    </p>
-                  )}
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Notify on Report Submission</p>
+                      <p className="text-sm text-gray-500">Get notified when purchasers submit reports</p>
+                    </div>
+                    <Switch
+                      checked={settings.notifyOnReportSubmission}
+                      onCheckedChange={(checked) => handleSettingChange('notifyOnReportSubmission', checked)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Automatic Verification</p>
+                      <p className="text-sm text-gray-500">Enable automatic verification of reports with minor issues</p>
+                    </div>
+                    <Switch
+                      checked={settings.automaticVerification}
+                      onCheckedChange={(checked) => handleSettingChange('automaticVerification', checked)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Enable Prediction Correction</p>
+                      <p className="text-sm text-gray-500">Automatically suggest corrections for prediction errors</p>
+                    </div>
+                    <Switch
+                      checked={settings.enablePredictionCorrection}
+                      onCheckedChange={(checked) => handleSettingChange('enablePredictionCorrection', checked)}
+                    />
+                  </div>
                 </div>
               </div>
 
               <Button 
                 type="submit" 
                 className="w-full sm:w-auto" 
-                disabled={saving || selectedResourceTypes.length === 0}
+                disabled={saving}
               >
                 {saving ? (
                   <>
@@ -154,4 +169,4 @@ const GeneratorManagement = () => {
   );
 };
 
-export default GeneratorManagement;
+export default SldcManagement;

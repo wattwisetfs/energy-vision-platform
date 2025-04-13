@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -17,7 +16,6 @@ import {
 import { Loader2, Sun, Wind, Box, Zap } from 'lucide-react';
 import { UserRole } from '@/types';
 
-// Helper components for role selection
 interface RoleButtonProps {
   role: UserRole;
   icon: React.ReactNode;
@@ -130,14 +128,13 @@ const SignUp = () => {
           Create your account
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-          Join the EnergyVision platform
+          Join the WattWise platform
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <Card className="py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {step === 1 ? (
-            // Step 1: Role selection
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-medium">Choose your role</h3>
@@ -187,7 +184,6 @@ const SignUp = () => {
               </Button>
             </div>
           ) : (
-            // Step 2: Registration form
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <Label htmlFor="email">Email address</Label>
@@ -238,7 +234,6 @@ const SignUp = () => {
                 </Select>
               </div>
 
-              {/* Role-specific fields */}
               {selectedRole === 'generator' && (
                 <div>
                   <Label>Resource Types</Label>
