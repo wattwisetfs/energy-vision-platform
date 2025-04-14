@@ -41,7 +41,7 @@ import NotFound from "./pages/NotFound";
 const setFavicon = () => {
   const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
   link.setAttribute('rel', 'icon');
-  link.setAttribute('href', '/lovable-uploads/6c3f8356-58e2-47b7-a3c1-c8d5498515ee.png');
+  link.setAttribute('href', '/lovable-uploads/de342a36-7bd1-4b74-957c-53b2c6b31900.png');
   link.setAttribute('type', 'image/png');
   document.head.appendChild(link);
 };

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
@@ -14,7 +15,8 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
-import IndiaMap from '@/components/map/IndiaMap';
+import EnhancedIndiaMap from '@/components/map/EnhancedIndiaMap';
+import { Logo } from '@/components/ui/logo';
 
 interface Supplier {
   id: string;
@@ -572,11 +574,11 @@ const GridMap = () => {
               </CardHeader>
               <CardContent className="p-2">
                 {loading ? (
-                  <div className="flex justify-center items-center h-[500px]">
+                  <div className="flex justify-center items-center h-[400px]">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
                 ) : (
-                  <IndiaMap
+                  <EnhancedIndiaMap
                     locations={filteredSuppliers.map(supplier => ({
                       name: supplier.name,
                       lat: supplier.location.lat,

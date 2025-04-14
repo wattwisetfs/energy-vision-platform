@@ -1,6 +1,6 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Logo } from '@/components/ui/logo';
 import { 
   BarChart3, 
   Zap, 
@@ -20,12 +20,7 @@ const LandingPage = () => {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="h-10 w-10 rounded-md bg-gradient-to-r from-energy-blue to-energy-green flex items-center justify-center">
-                  <BarChart3 className="h-6 w-6 text-white" />
-                </div>
-              </div>
-              <h1 className="ml-3 text-xl font-bold text-gray-900 dark:text-white">WattWise</h1>
+              <Logo />
             </div>
             <div className="hidden md:block">
               <div className="flex items-center space-x-4">
@@ -80,7 +75,7 @@ const LandingPage = () => {
               <div className="relative p-4">
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-medium">Energy Demand Forecast</h3>
+                    <Logo size="sm" withText={false} />
                     <span className="text-sm text-gray-500">Last 7 Days</span>
                   </div>
                   <div className="aspect-[1.5/1] bg-gradient-to-r from-energy-blue/80 to-energy-green/80 rounded-lg flex items-end p-3">
@@ -95,15 +90,15 @@ const LandingPage = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-2 mt-4">
                     <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                      <div className="text-xs text-gray-500">Peak Load</div>
+                      <div className="text-xs text-gray-500 mb-1">Peak Load</div>
                       <div className="text-xl font-semibold">482 MW</div>
                     </div>
                     <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                      <div className="text-xs text-gray-500">Avg. Load</div>
+                      <div className="text-xs text-gray-500 mb-1">Avg. Load</div>
                       <div className="text-xl font-semibold">356 MW</div>
                     </div>
                     <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                      <div className="text-xs text-gray-500">Carbon</div>
+                      <div className="text-xs text-gray-500 mb-1">Carbon</div>
                       <div className="text-xl font-semibold">0.32 t/MWh</div>
                     </div>
                   </div>
@@ -374,6 +369,9 @@ const LandingPage = () => {
       {/* Call to Action */}
       <section className="bg-energy-blue text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center">
+          <div className="flex justify-center mb-6">
+            <Logo size="lg" className="text-white" />
+          </div>
           <h2 className="text-3xl font-extrabold sm:text-4xl">
             Ready to transform your energy operations?
           </h2>
@@ -395,12 +393,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <div className="flex items-center">
-                <div className="h-8 w-8 rounded-md bg-gradient-to-r from-energy-blue to-energy-green flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-white" />
-                </div>
-                <h3 className="ml-3 text-lg font-bold">WattWise</h3>
-              </div>
+              <Logo className="text-white" />
               <p className="mt-4 text-sm">
                 Smarter energy predictions for a sustainable future.
               </p>

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
+import { Logo } from "../ui/logo";
 import { User } from "@/types";
 
 interface MainLayoutProps {
