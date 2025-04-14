@@ -12,7 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import LineChart from '@/components/dashboard/LineChart';
 import BarChart from '@/components/dashboard/BarChart';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 
 interface ForecastData {
   timestamp: string;
@@ -30,11 +29,6 @@ const PurchaserPredictions = () => {
   const [endDate, setEndDate] = useState('');
   const [frequency, setFrequency] = useState('hourly');
   const [forecastData, setForecastData] = useState<ForecastData[]>([]);
-  const [ignoreFactors, setIgnoreFactors] = useState({
-    weather: false,
-    season: false,
-    weekday: false,
-  });
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,22 +60,16 @@ const PurchaserPredictions = () => {
         
         const baseLoad = 250 + Math.random() * 200;
         
-        let adjustedLoad = baseLoad;
-        if (!ignoreFactors.weather) adjustedLoad *= (0.9 + Math.random() * 0.2);
-        if (!ignoreFactors.season) adjustedLoad *= (0.95 + Math.random() * 0.1);
-        if (!ignoreFactors.weekday) {
-          const day = currentDate.getDay();
-          if (day === 0 || day === 6) adjustedLoad *= 0.85;
-        }
+        const adjustedLoad = baseLoad * (0.85 + Math.random() * 0.3);
         
         mockData.push({
           timestamp: currentDate.toISOString(),
           predicted_load: Math.round(adjustedLoad),
           feature_impacts: {
-            temperature: ignoreFactors.weather ? 0 : 0.3 + Math.random() * 0.2,
-            humidity: ignoreFactors.weather ? 0 : 0.1 + Math.random() * 0.1,
-            season: ignoreFactors.season ? 0 : 0.15 + Math.random() * 0.1,
-            day_of_week: ignoreFactors.weekday ? 0 : 0.2 + Math.random() * 0.15,
+            temperature: 0.3 + Math.random() * 0.2,
+            humidity: 0.1 + Math.random() * 0.1,
+            season: 0.15 + Math.random() * 0.1,
+            day_of_week: 0.2 + Math.random() * 0.15,
             time_of_day: 0.15 + Math.random() * 0.1,
           }
         });
@@ -205,7 +193,10 @@ const PurchaserPredictions = () => {
         
         <Card>
           <CardHeader>
-            <CardTitle>Generate Forecast</CardTitle>
+            <CardTitle className="flex items-center">
+              <img src="/lovable-uploads/6c3f8356-58e2-47b7-a3c1-c8d5498515ee.png" alt="Logo" className="h-6 w-6 mr-2" />
+              Generate Forecast
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -245,36 +236,6 @@ const PurchaserPredictions = () => {
                       <SelectItem value="daily">Daily</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-sm font-medium mb-3">Scenario Analysis</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="ignore-weather"
-                      checked={ignoreFactors.weather}
-                      onCheckedChange={(checked) => setIgnoreFactors({...ignoreFactors, weather: checked})}
-                    />
-                    <Label htmlFor="ignore-weather">Ignore Weather</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="ignore-season"
-                      checked={ignoreFactors.season}
-                      onCheckedChange={(checked) => setIgnoreFactors({...ignoreFactors, season: checked})}
-                    />
-                    <Label htmlFor="ignore-season">Ignore Season</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="ignore-weekday"
-                      checked={ignoreFactors.weekday}
-                      onCheckedChange={(checked) => setIgnoreFactors({...ignoreFactors, weekday: checked})}
-                    />
-                    <Label htmlFor="ignore-weekday">Ignore Day of Week</Label>
-                  </div>
                 </div>
               </div>
               

@@ -67,7 +67,7 @@ const IndiaMap: React.FC<IndiaMapProps> = ({ locations, selectedLocation, onLoca
     return selectedLocation?.resourceType === resourceType ? 1 : 0.7;
   };
 
-  // This is a simplified map of India with more accurate outlines
+  // This is a better implementation using the provided image as reference
   return (
     <div className="w-full h-[500px] bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden relative">
       <svg 
@@ -83,7 +83,7 @@ const IndiaMap: React.FC<IndiaMapProps> = ({ locations, selectedLocation, onLoca
           strokeWidth="0.5"
         />
         
-        {/* State boundaries (simplified) */}
+        {/* State boundaries */}
         <g stroke="#FFFFFF" strokeWidth="0.2" fill="none">
           {/* Northern states */}
           <path d="M38,20 C38,22 37,24 35,25 C33,26 33,28 35,30 C37,32 40,32 40,35" />
@@ -185,7 +185,16 @@ const IndiaMap: React.FC<IndiaMapProps> = ({ locations, selectedLocation, onLoca
         India Grid Map
       </div>
       
-      {/* Use the uploaded image as a background reference to align the map */}
+      {/* Logo in the top-right corner */}
+      <div className="absolute top-2 right-2 w-8 h-8">
+        <img 
+          src="/lovable-uploads/6c3f8356-58e2-47b7-a3c1-c8d5498515ee.png" 
+          alt="Logo" 
+          className="w-full h-full object-contain"
+        />
+      </div>
+      
+      {/* Use the uploaded image as a background reference */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-0">
         <img 
           src="/lovable-uploads/de342a36-7bd1-4b74-957c-53b2c6b31900.png" 

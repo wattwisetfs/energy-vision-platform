@@ -37,6 +37,18 @@ import SldcNotifications from "./pages/sldc/Notifications";
 // 404 page
 import NotFound from "./pages/NotFound";
 
+// Create a link element for the favicon
+const setFavicon = () => {
+  const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+  link.setAttribute('rel', 'icon');
+  link.setAttribute('href', '/lovable-uploads/6c3f8356-58e2-47b7-a3c1-c8d5498515ee.png');
+  link.setAttribute('type', 'image/png');
+  document.head.appendChild(link);
+};
+
+// Set favicon when the app loads
+setFavicon();
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -68,7 +80,7 @@ function App() {
               <Route path="/purchaser/management" element={<PurchaserManagement />} />
               <Route path="/purchaser/notifications" element={<PurchaserNotifications />} />
               
-              {/* SLDC Routes - now using our implemented pages */}
+              {/* SLDC Routes */}
               <Route path="/sldc/dashboard" element={<SldcDashboard />} />
               <Route path="/sldc/schedules" element={<SldcSchedules />} />
               <Route path="/sldc/reports" element={<SldcReports />} />

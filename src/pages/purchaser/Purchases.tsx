@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Download, ShoppingCart, Filter, Search, Plus, Calendar } from 'lucide-react';
+import { Loader2, Download, ShoppingCart, Filter, Search, Plus, Calendar, ExternalLink } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import {
   Dialog,
@@ -18,8 +18,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Badge } from '@/components/ui/badge';
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger 
+} from "@/components/ui/popover";
 
 interface Purchase {
   id: string;
@@ -31,6 +37,8 @@ interface Purchase {
   cost: number;
   carbonEstimate: number;
   location: { lat: number; lon: number };
+  purchaseType: string;
+  iexType?: string;
 }
 
 const PurchaserPurchases = () => {
@@ -53,9 +61,14 @@ const PurchaserPurchases = () => {
     volumeMW: 0,
     cost: 0,
     date: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
+    purchaseType: 'ppa', // Default purchase type
+    iexType: '', // Empty by default
   });
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showIexOptions, setShowIexOptions] = useState(false);
+  const [redirectToIex, setRedirectToIex] = useState(false);
 
   useEffect(() => {
     const fetchPurchases = async () => {
@@ -64,7 +77,6 @@ const PurchaserPurchases = () => {
 
       try {
         if (user?.organizationId) {
-          // In real implementation, we would fetch from Firestore
           // For demo, simulate API call
           await new Promise(resolve => setTimeout(resolve, 1000));
           
@@ -79,6 +91,7 @@ const PurchaserPurchases = () => {
               cost: 630000,
               carbonEstimate: 3,
               location: { lat: 12.9716, lon: 77.5946 },
+              purchaseType: 'ppa'
             },
             {
               id: 'p2',
@@ -90,6 +103,7 @@ const PurchaserPurchases = () => {
               cost: 760000,
               carbonEstimate: 2,
               location: { lat: 13.1986, lon: 77.7066 },
+              purchaseType: 'bilateral'
             },
             {
               id: 'p3',
@@ -101,6 +115,7 @@ const PurchaserPurchases = () => {
               cost: 1015000,
               carbonEstimate: 273,
               location: { lat: 13.0298, lon: 77.5971 },
+              purchaseType: 'external'
             },
             {
               id: 'p4',
@@ -112,6 +127,7 @@ const PurchaserPurchases = () => {
               cost: 1125000,
               carbonEstimate: 7.5,
               location: { lat: 12.8065, lon: 77.5968 },
+              purchaseType: 'banking'
             },
             {
               id: 'p5',
@@ -123,6 +139,8 @@ const PurchaserPurchases = () => {
               cost: 500000,
               carbonEstimate: 2.5,
               location: { lat: 12.9010, lon: 77.6210 },
+              purchaseType: 'iex',
+              iexType: 'dam'
             },
           ];
           
@@ -180,6 +198,16 @@ const PurchaserPurchases = () => {
     setFilteredPurchases(result);
   }, [purchases, filters]);
   
+  // Reset the IEX type when purchase type changes
+  useEffect(() => {
+    if (newPurchase.purchaseType === 'iex') {
+      setShowIexOptions(true);
+    } else {
+      setShowIexOptions(false);
+      setNewPurchase(prev => ({ ...prev, iexType: '' }));
+    }
+  }, [newPurchase.purchaseType]);
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewPurchase(prev => ({
@@ -193,6 +221,23 @@ const PurchaserPurchases = () => {
       ...prev,
       [name]: value
     }));
+  };
+  
+  const handleIexTypeSelect = (type: string) => {
+    setNewPurchase(prev => ({ ...prev, iexType: type }));
+    setRedirectToIex(true);
+    
+    // Close the dialog and show a toast message
+    setTimeout(() => {
+      setDialogOpen(false);
+      toast({
+        title: "Redirecting to IEX Portal",
+        description: `You will be redirected to IEX ${type.toUpperCase()} bidding portal.`,
+      });
+    }, 500);
+    
+    // In a real application, this would redirect to the IEX website
+    // window.open('https://www.iexindia.com', '_blank');
   };
   
   const handleSubmit = async () => {
@@ -209,7 +254,6 @@ const PurchaserPurchases = () => {
     setIsSubmitting(true);
     
     try {
-      // In real implementation, we would save to Firestore
       // For demo, simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -240,7 +284,9 @@ const PurchaserPurchases = () => {
         volumeMW: newPurchase.volumeMW,
         cost: newPurchase.cost,
         carbonEstimate,
-        location: { lat: 13.0 + Math.random() * 0.5, lon: 77.5 + Math.random() * 0.5 }
+        location: { lat: 13.0 + Math.random() * 0.5, lon: 77.5 + Math.random() * 0.5 },
+        purchaseType: newPurchase.purchaseType,
+        iexType: newPurchase.iexType || undefined
       };
       
       // Update state with new purchase
@@ -258,6 +304,8 @@ const PurchaserPurchases = () => {
         volumeMW: 0,
         cost: 0,
         date: new Date().toISOString().split('T')[0],
+        purchaseType: 'ppa',
+        iexType: '',
       });
       setDialogOpen(false);
     } catch (error) {
@@ -273,18 +321,19 @@ const PurchaserPurchases = () => {
   
   const handleExportCSV = () => {
     // Create CSV content
-    const headers = ['Date', 'Supplier', 'Resource Type', 'Volume (MW)', 'Cost (₹)', 'Carbon Estimate (tons)'];
+    const header = ['Date', 'Supplier', 'Resource Type', 'Volume (MW)', 'Cost (₹)', 'Carbon Estimate (tons)', 'Purchase Type'];
     const rows = filteredPurchases.map(purchase => [
       purchase.date,
       purchase.supplier,
       purchase.resourceType,
       purchase.volumeMW.toString(),
       purchase.cost.toString(),
-      purchase.carbonEstimate.toString()
+      purchase.carbonEstimate.toString(),
+      purchase.purchaseType + (purchase.iexType ? ` (${purchase.iexType.toUpperCase()})` : '')
     ]);
     
     const csvContent = [
-      headers.join(','),
+      header.join(','),
       ...rows.map(row => row.join(','))
     ].join('\n');
     
@@ -313,6 +362,23 @@ const PurchaserPurchases = () => {
     }
   };
   
+  const getPurchaseTypeColor = (type: string) => {
+    switch (type) {
+      case 'ppa':
+        return 'bg-green-100 text-green-800';
+      case 'bilateral':
+        return 'bg-purple-100 text-purple-800';
+      case 'external':
+        return 'bg-orange-100 text-orange-800';
+      case 'banking':
+        return 'bg-blue-100 text-blue-800';
+      case 'iex':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+  
   // Calculate totals for the current filtered view
   const calculateTotals = () => {
     return filteredPurchases.reduce((acc, purchase) => {
@@ -330,7 +396,10 @@ const PurchaserPurchases = () => {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <h1 className="text-2xl font-bold">Energy Purchases</h1>
+          <h1 className="text-2xl font-bold flex items-center">
+            <img src="/lovable-uploads/6c3f8356-58e2-47b7-a3c1-c8d5498515ee.png" alt="Logo" className="h-8 w-8 mr-2" />
+            Energy Purchases
+          </h1>
           
           <div className="flex mt-4 md:mt-0 space-x-2">
             <Button variant="outline" onClick={handleExportCSV} disabled={filteredPurchases.length === 0}>
@@ -351,82 +420,137 @@ const PurchaserPurchases = () => {
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="supplier">Supplier Name</Label>
-                    <Input
-                      id="supplier"
-                      name="supplier"
-                      value={newPurchase.supplier}
-                      onChange={handleInputChange}
-                      placeholder="Enter supplier name"
-                    />
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="resourceType">Resource Type</Label>
+                    <Label htmlFor="purchaseType">Purchase Type</Label>
                     <Select
-                      value={newPurchase.resourceType}
-                      onValueChange={(value) => handleSelectChange('resourceType', value)}
+                      value={newPurchase.purchaseType}
+                      onValueChange={(value) => handleSelectChange('purchaseType', value)}
                     >
-                      <SelectTrigger id="resourceType">
-                        <SelectValue placeholder="Select resource type" />
+                      <SelectTrigger id="purchaseType">
+                        <SelectValue placeholder="Select purchase type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="solar">Solar</SelectItem>
-                        <SelectItem value="wind">Wind</SelectItem>
-                        <SelectItem value="hydro">Hydro</SelectItem>
-                        <SelectItem value="coal">Coal</SelectItem>
+                        <SelectItem value="ppa">Power Purchase Agreement (PPA)</SelectItem>
+                        <SelectItem value="external">External Plants</SelectItem>
+                        <SelectItem value="bilateral">Bilateral</SelectItem>
+                        <SelectItem value="banking">Banking</SelectItem>
+                        <SelectItem value="iex">Indian Energy Exchange (IEX)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   
-                  <div className="grid gap-2">
-                    <Label htmlFor="volumeMW">Volume (MW)</Label>
-                    <Input
-                      id="volumeMW"
-                      name="volumeMW"
-                      type="number"
-                      value={newPurchase.volumeMW || ''}
-                      onChange={handleInputChange}
-                      placeholder="Enter volume in MW"
-                    />
-                  </div>
+                  {showIexOptions && (
+                    <div className="grid gap-2">
+                      <Label>IEX Market Type</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="flex flex-col h-auto p-4"
+                          onClick={() => handleIexTypeSelect('dam')}
+                        >
+                          <span className="font-semibold mb-1">DAM</span>
+                          <span className="text-xs text-gray-500">Day-Ahead Market</span>
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="flex flex-col h-auto p-4"
+                          onClick={() => handleIexTypeSelect('rtm')}
+                        >
+                          <span className="font-semibold mb-1">RTM</span>
+                          <span className="text-xs text-gray-500">Real-Time Market</span>
+                        </Button>
+                      </div>
+                      <p className="text-xs text-blue-600 flex items-center mt-1">
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        Selecting an option will redirect you to IEX bidding platform
+                      </p>
+                    </div>
+                  )}
                   
-                  <div className="grid gap-2">
-                    <Label htmlFor="cost">Cost (₹)</Label>
-                    <Input
-                      id="cost"
-                      name="cost"
-                      type="number"
-                      value={newPurchase.cost || ''}
-                      onChange={handleInputChange}
-                      placeholder="Enter total cost"
-                    />
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <Label htmlFor="date">Purchase Date</Label>
-                    <Input
-                      id="date"
-                      name="date"
-                      type="date"
-                      value={newPurchase.date}
-                      onChange={handleInputChange}
-                    />
-                  </div>
+                  {!showIexOptions && (
+                    <>
+                      <div className="grid gap-2">
+                        <Label htmlFor="supplier">Supplier Name</Label>
+                        <Input
+                          id="supplier"
+                          name="supplier"
+                          value={newPurchase.supplier}
+                          onChange={handleInputChange}
+                          placeholder="Enter supplier name"
+                        />
+                      </div>
+                      
+                      <div className="grid gap-2">
+                        <Label htmlFor="resourceType">Resource Type</Label>
+                        <Select
+                          value={newPurchase.resourceType}
+                          onValueChange={(value) => handleSelectChange('resourceType', value)}
+                        >
+                          <SelectTrigger id="resourceType">
+                            <SelectValue placeholder="Select resource type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="solar">Solar</SelectItem>
+                            <SelectItem value="wind">Wind</SelectItem>
+                            <SelectItem value="hydro">Hydro</SelectItem>
+                            <SelectItem value="coal">Coal</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="grid gap-2">
+                        <Label htmlFor="volumeMW">Volume (MW)</Label>
+                        <Input
+                          id="volumeMW"
+                          name="volumeMW"
+                          type="number"
+                          value={newPurchase.volumeMW || ''}
+                          onChange={handleInputChange}
+                          placeholder="Enter volume in MW"
+                        />
+                      </div>
+                      
+                      <div className="grid gap-2">
+                        <Label htmlFor="cost">Cost (₹)</Label>
+                        <Input
+                          id="cost"
+                          name="cost"
+                          type="number"
+                          value={newPurchase.cost || ''}
+                          onChange={handleInputChange}
+                          placeholder="Enter total cost"
+                        />
+                      </div>
+                      
+                      <div className="grid gap-2">
+                        <Label htmlFor="date">Purchase Date</Label>
+                        <Input
+                          id="date"
+                          name="date"
+                          type="date"
+                          value={newPurchase.date}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
                 
-                <div className="flex justify-end">
-                  <Button onClick={handleSubmit} disabled={isSubmitting}>
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      "Save Purchase"
-                    )}
-                  </Button>
-                </div>
+                {!showIexOptions && (
+                  <DialogFooter>
+                    <Button onClick={handleSubmit} disabled={isSubmitting}>
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        "Save Purchase"
+                      )}
+                    </Button>
+                  </DialogFooter>
+                )}
               </DialogContent>
             </Dialog>
           </div>
@@ -486,7 +610,10 @@ const PurchaserPurchases = () => {
             {/* Filters and Purchases Table */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle>Purchase History</CardTitle>
+                <CardTitle className="flex items-center">
+                  <img src="/lovable-uploads/6c3f8356-58e2-47b7-a3c1-c8d5498515ee.png" alt="Logo" className="h-5 w-5 mr-2" />
+                  Purchase History
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col sm:flex-row justify-between mb-4 space-y-2 sm:space-y-0">
@@ -560,6 +687,7 @@ const PurchaserPurchases = () => {
                             <th className="py-3 px-4 text-left font-medium">Date</th>
                             <th className="py-3 px-4 text-left font-medium">Supplier</th>
                             <th className="py-3 px-4 text-left font-medium">Resource</th>
+                            <th className="py-3 px-4 text-left font-medium">Purchase Type</th>
                             <th className="py-3 px-4 text-right font-medium">Volume (MW)</th>
                             <th className="py-3 px-4 text-right font-medium">Cost (₹)</th>
                             <th className="py-3 px-4 text-right font-medium">Carbon (tons)</th>
@@ -578,6 +706,12 @@ const PurchaserPurchases = () => {
                               <td className="py-3 px-4">
                                 <Badge variant="outline" className={`${getResourceTypeColor(purchase.resourceType)} capitalize`}>
                                   {purchase.resourceType}
+                                </Badge>
+                              </td>
+                              <td className="py-3 px-4">
+                                <Badge variant="outline" className={`${getPurchaseTypeColor(purchase.purchaseType)} capitalize`}>
+                                  {purchase.purchaseType}
+                                  {purchase.iexType && ` (${purchase.iexType.toUpperCase()})`}
                                 </Badge>
                               </td>
                               <td className="py-3 px-4 text-right">{purchase.volumeMW.toLocaleString()}</td>
